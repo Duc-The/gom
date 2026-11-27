@@ -5,7 +5,9 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  worker: { format: "es", rollupOptions: { output: { entryFileNames: "firebase-messaging-sw.js" } } },
   server: {
+    headers: { "Service-Worker-Allowed": "/" },
     host: "127.0.0.1",
     port: 5173,
     strictPort: true,

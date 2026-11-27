@@ -21,6 +21,7 @@ import { Cart, Checkout } from "@/pages/Checkout";
 import Admin from "@/pages/Admin";
 import VnpayResult from "@/pages/VnpayResult";
 import PaymentSuccess from "@/pages/PaymentSuccess";
+import { NotificationRuntime } from "@/components/common/NotificationCenter";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -32,6 +33,7 @@ function ScrollToTop() {
 export default function Router() {
   return (
     <BrowserRouter>
+      <NotificationRuntime />
       <ScrollToTop />
       <Routes>
         <Route element={<StoreLayout />}>

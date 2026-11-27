@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { disablePush } from "@/lib/push";
 
 export const useCart = create(
   persist(
@@ -69,10 +70,13 @@ export const useAuth = create((set) => ({
     sessionStorage.setItem("gce-user", JSON.stringify(user));
     set({ user });
   },
-  logout() {
+  async logout() {
+    const accessToken = sessionStorage.getItem("gce-token");
+    const cleanup = disablePush(accessToken).catch(() => {});
     sessionStorage.removeItem("gce-token");
     sessionStorage.removeItem("gce-user");
     sessionStorage.removeItem("gce-reservation");
     set({ user: null });
+    await cleanup;
   },
 }));

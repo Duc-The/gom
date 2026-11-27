@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local environment values; keep only the blank example in Git.
+.env*
+!.env.example

@@ -12,6 +12,7 @@ import {
 import { useRemote } from "@/hooks/useRemote";
 import { useCart } from "@/stores/shop.store";
 import BrandLogo from "@/components/common/BrandLogo";
+import NotificationCenter from "@/components/common/NotificationCenter";
 
 export default function StoreLayout() {
   const [menu, setMenu] = useState(false);
@@ -41,6 +42,7 @@ export default function StoreLayout() {
             <NavLink to="/lien-he">Liên hệ</NavLink>
           </nav>
           <div className="header-tools">
+            <NotificationCenter />
             <form
               className="search-inline"
               onSubmit={(e) => {

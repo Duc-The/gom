@@ -109,7 +109,7 @@ export default function POS({ products, refresh }) {
               value={channel}
               onChange={(e) => setChannel(e.target.value)}
             >
-              <option value="STORE">Tại cửa hàng · POS</option>
+              <option value="STORE">Tại cửa hàng</option>
               <option value="FACEBOOK">Facebook · nhập thủ công</option>
               <option value="INSTAGRAM">Instagram · nhập thủ công</option>
             </select>

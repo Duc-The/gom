@@ -15,10 +15,12 @@ export function useRemote(path, version = 0) {
           if (active) setResult({ path, data: null, error });
         });
     load();
+    window.addEventListener("gce-refresh", load);
     const timer = setInterval(load, 5000);
     return () => {
       active = false;
       clearInterval(timer);
+      window.removeEventListener("gce-refresh", load);
     };
   }, [path, version]);
   return result.path === path ? result : { data: null, error: null };

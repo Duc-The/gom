@@ -1,4 +1,5 @@
 import { z } from "zod";
+import * as notices from "@/services/notification.service";
 import { readJson } from "@/lib/request";
 import { apiSuccess, handleApiError } from "@/lib/response";
 import { ApiError } from "@/lib/errors";
@@ -50,6 +51,20 @@ async function handler(request: Request, context: Context) {
       );
     }
     const actor = await requireUser(request);
+    if (resource === "notifications" && !action) {
+      if (!id && method === "GET") return apiSuccess(await notices.notifications(actor));
+      if (id === "read" && method === "POST") {
+        const input = z.strictObject({ id: z.uuid().optional() }).parse(await readJson(request));
+        return apiSuccess(await notices.readNotifications(actor, input.id));
+      }
+      if (id === "tokens" && ["POST", "DELETE"].includes(method)) {
+        await rateLimit(`push-token:${actor.id}`, 30, 3600);
+        const tokenSchema = z.string().min(20).max(4096);
+        const input = (method === "POST" ? z.strictObject({ token: tokenSchema, projectId: z.string().min(1).max(100) }) : z.strictObject({ token: tokenSchema })).parse(await readJson(request));
+        if ("projectId" in input && input.projectId !== process.env.FIREBASE_PROJECT_ID?.trim()) throw new ApiError("Frontend và backend đang dùng hai Firebase project khác nhau. Tiệm cần kiểm tra cấu hình.", 422);
+        return apiSuccess(method === "POST" ? await notices.registerPushToken(actor, input.token) : await notices.removePushToken(actor, input.token));
+      }
+    }
     if (resource === "account" && !id) {
       if (method === "GET") return apiSuccess(await account.account(actor));
       if (method === "PUT")

@@ -46,7 +46,7 @@ async function main() {
       console.log('Startup bootstrap: empty PostgreSQL initialized; repeat kept catalog count and existing inventory.');
     } finally { await fixtureDb.end(); }
     await command(
-      ["tsx", "--test", "--test-concurrency=1", "tests/integration/shop.test.ts", "tests/integration/integrations.test.ts"],
+      ["tsx", "--test", "--test-concurrency=1", "tests/integration/shop.test.ts", "tests/integration/integrations.test.ts", "tests/integration/notifications.test.ts"],
       testUrl.toString(),
     );
   } finally {

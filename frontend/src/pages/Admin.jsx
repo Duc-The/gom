@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useSearchParams } from "react-router-dom";
+import NotificationCenter from "@/components/common/NotificationCenter";
+import { useNotifications } from "@/stores/notification.store";
 import {
   Boxes,
   LayoutDashboard,
@@ -38,7 +40,7 @@ const tabs = [
   [ShoppingBag, "orders", "Đơn hàng"],
   [Package, "products", "Sản phẩm"],
   [Boxes, "inventory", "Tồn kho & nhập hàng"],
-  [Store, "pos", "Bán hàng · POS"],
+  [Store, "pos", "Bán hàng"],
   [RefreshCw, "returns", "Đổi trả & hoàn tiền"],
   [MessageSquare, "inquiries", "Hộp thư tiệm"],
   [Tag, "vouchers", "Mã ưu đãi"],
@@ -54,7 +56,11 @@ const can = (user, tab) =>
 export default function Admin() {
   const user = useAuth((s) => s.user);
   const logout = useAuth((s) => s.logout);
-  const [tab, setTab] = useState("dashboard");
+  const [params, setParams] = useSearchParams();
+  const requestedTab = params.get("tab") || "dashboard";
+  const tab = user && can(user, requestedTab) && tabs.some(([, key]) => key === requestedTab) ? requestedTab : "dashboard";
+  const setTab = value => setParams({ tab: value });
+  const counts = useNotifications(s => s.data?.counts);
   const [menu, setMenu] = useState(false);
   const [version, setVersion] = useState(0);
   const { data, error } = useRemote(
@@ -66,7 +72,7 @@ export default function Admin() {
     version,
   );
   const categories = useRemote("/shop/categories").data || [];
-  const refresh = () => setVersion((v) => v + 1);
+  const refresh = () => { setVersion((v) => v + 1); useNotifications.getState().refresh(); };
   if (!user) return <Navigate to="/dang-nhap?next=/quan-tri" replace />;
   if (user.role === "USER") return <Navigate to="/tai-khoan" replace />;
   return (
@@ -90,7 +96,7 @@ export default function Admin() {
               >
                 <Icon size={18} />
                 {title}
-                {key === "orders" && data?.pending > 0 && <b>{data.pending}</b>}
+                {counts?.[key] > 0 && <b>{counts[key]}</b>}
               </button>
             ))}
         </nav>
@@ -119,6 +125,7 @@ export default function Admin() {
             <h1>{tabs.find(([, key]) => key === tab)?.[2]}</h1>
           </div>
           <div className="admin-header-actions">
+            <NotificationCenter />
             <button className="btn secondary" onClick={refresh}>
               <RefreshCw size={15} />
               Làm mới
